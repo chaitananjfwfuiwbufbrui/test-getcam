@@ -97,10 +97,10 @@ from django.utils.encoding import force_bytes,force_text,DjangoUnicodeDecodeErro
 from django.utils.http import urlsafe_base64_encode,urlsafe_base64_decode
 from django.contrib.sites.shortcuts import get_current_site
 import base64
-from .utils import token_Generator
+from .utils import account_activation_token 
 # Create your views here.
 
-
+from django.core.mail import EmailMessage
 
 
 
@@ -151,29 +151,11 @@ def register(request):
                     new_user.save()
                     Profile.objects.create(user = new_user)
                     email = user_form.cleaned_data['email']
-                    #domain knowing
-                    print("a")
-                    uidb64 = urlsafe_base64_encode(force_bytes(new_user.pk)).encode()
-                    # uidb64 = new_user.pk
-                    print("b",uidb64,new_user.pk,type(uidb64))
-                    domain = get_current_site(request).domain
-                    link = reverse('activate',kwargs = {'uidb64':uidb64,'token':token_Generator.make_token(new_user)})
-                    print("c")
 
                     #email verfication 
-                    email_subject = 'verify your account'
-                    activate_url = f'https://{domain}{link}'
-                    email_message = f"hi  {new_user.username}  please verify your email address\n {activate_url} "
-                    send_mail(
-                        email_subject,
-                        email_message,
-                        'from@example.com',
-                        [email],
-                        fail_silently=False,
-                    )
-                    # email.SEND
-
-                    messe = "Succesfully Account Created"
+                    email_verify_send(new_user,request,email)
+                    messages.success(request, 'Account successfully created')
+                    messe = "Account successfully created"
                     return render(request,'auth/register_done.html',{'new_user':new_user,'messe':messe})
                 else:
                     messages.error(request,"account is already exist please try again")
@@ -191,6 +173,30 @@ def register(request):
             
         # return render(request,'auth/register_done.html')
             return render(request,'auth/register.html',{'user_form' : user_form})
+
+def email_verify_send(new_user,request,email):
+                    current_site = get_current_site(request)
+                    email_body = {
+                        'user':new_user,
+                        'domain': current_site.domain,
+                        'uid': urlsafe_base64_encode(force_bytes(new_user.pk)),
+                        'token': account_activation_token.make_token(new_user),
+                    }
+
+                    link = reverse('activate', kwargs={
+                                'uidb64': email_body['uid'], 'token': email_body['token']})
+
+                    email_subject = 'Activate your account'
+
+                    activate_url = 'http://'+current_site.domain+link
+
+                    email = EmailMessage(
+                        email_subject,
+                        'Hi '+new_user.username + ', Please the link below to activate your account \n'+activate_url,
+                        'noreply@semycolon.com',
+                        [email],
+                    )
+                    email.send(fail_silently=False)
 @login_required
 def edit(request):
     if request.method == 'POST':
@@ -215,27 +221,23 @@ def edit(request):
 
 
 class verficationview(View):
-    def get(self,request,uidb64,token):
-        id = force_text(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(id = id)
-        print(user,id)
+    def get(self, request, uidb64, token):
         try:
+            id = force_text(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=id)
 
-            
-            if not account_activation_token.check_token(user,token):
-                messages.info(request,"emailverification already done!!")
-                return redirect('login')
+            if not account_activation_token.check_token(user, token):
+                return redirect('login'+'?message='+'User already activated')
+
             if user.is_active:
-                
-                messages.info(request,"emailverified")
                 return redirect('login')
-            else:
-                user.is_active = True
-                user.save()
-                messages.info(request,"emailverified")
-        except Exception as ex :
-            messages.info(request,"emailverification failed !!")
+            user.is_active = True
+            user.save()
 
+            messages.success(request, 'Account activated successfully')
+            return redirect('login')
 
-        
+        except Exception as ex:
+            pass
+
         return redirect('login')
