@@ -39,7 +39,7 @@ def home(request):
                 
         context = {'dataa' : dataa,"latest":latest,'cartitems':cartitems}
     else:
-        latest = products.objects.filter(pub_date__range=["2020-09-17", "2020-12-25"])
+        latest = products.objects.filter(pub_date__range=["2020-09-17", "2021-12-25"])
         
         dataa = products.objects.all()
         context = {'dataa' : dataa,"latest":latest}

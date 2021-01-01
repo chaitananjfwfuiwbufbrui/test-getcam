@@ -40,6 +40,21 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
+    'django.contrib.sites',
+
+
+    #bootstrap
+      'crispy_forms',
+
+
+
+    #social auth
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.facebook',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -53,6 +68,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'app.urls'
+
+SITE_ID = 1
+# APPEND_SLASH=False 
 
 TEMPLATES = [
     {
@@ -127,3 +145,17 @@ STATICFILES_DIRS = [
 ]
 MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 MEDIA_URL = '/media/'
+LOGIN_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'
+LOGOUT_URL = 'logout'
+
+
+
+
+#email stuff
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = '587'
+EMAIL_HOST_USER = 'kc508275@gmail.com'
+# DEFAULT_FROM_EMAIL = 'kc508275@gmail.com'
+EMAIL_HOST_PASSWORD = '2001kc2005'
+EMAIL_USE_TLS =True
