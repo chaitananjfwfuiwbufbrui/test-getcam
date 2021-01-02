@@ -1,81 +1,4 @@
-# from django.shortcuts import render
-# from django.shortcuts import render
-# from django.http import JsonResponse
-# # Create your views here.
-# from django.shortcuts import render
-# from math import ceil
-# import json
-# import  datetime
-# # Create your views here.
-# from django.shortcuts import render,HttpResponse,redirect
-# from items.models import *
-# from  django.contrib.auth.models import User 
-# from django.contrib.auth import logout,authenticate
-# from django.contrib.auth.forms import AuthenticationForm
-# from django.contrib.auth import login as auth_login
-# from  django.contrib import messages
 
-
-# from datetime import datetime ,timedelta,date
-# # Create your views here.
-# def login(request):
-#     if request.method == 'POST':
-#        loginuser = request.POST['loginuser'] 
-#        loginPassword= request.POST['loginPassword']
-#        user = authenticate(username=loginuser,password=loginPassword)
-#        if user is not None:
-#             auth_login(request,user)
-#             messages.success(request,"sucessfully login")
-            
-#             return redirect('home')
-#        else:
-#            messages.error(request,'invalid username')
-#            return redirect('login')
-  
-#     return render(request,'login.html')
-# def logouts(request):
-#     logout(request)
-#     messages.success(request,'successfully logout')
-#     return redirect('home')
-    
-
-
-
-# def signin(request):
-#     if request.method == 'POST':
-#        user = request.POST['signupuser'] 
-#        email = request.POST['signupemail']
-#        signupfname = request.POST['signupfname']
-#        signupsname = request.POST['signupsname']
-#        pass1 = request.POST['inputPassword1']
-#        pass2 = request.POST['inputPassword2']
-#        if len(user) > 10:
-#             messages.error(request,"user name should be less than 10 characters")
-#             return redirect('home')
-            
-#        if pass1 != pass2:
-#             messages.error(request,"passwoard should be match")
-#             return redirect('home')
-
-#        if not user.isalnum():
-#             messages.error(request,"username must be in alphabhates and numaric")
-#             return redirect('home')
-
-
-
-#        myuser = User.objects.create_user(user,email,pass1)
-#        myuser.first_name= signupfname
-#        myuser.last_name = signupsname
-#        myuser.save()
-#        messages.success(request,"your account has been successfully created")
-#        create_cus = Customer.objects.get_or_create(user=user,name=signupfname,email=email)
-#        create_cus.save()
-#        return redirect('signin')
-       
-#     else:
-#         return render(request,'signinpage.html')  
-
-       
 
 # ----> actual
 
@@ -101,14 +24,11 @@ from .utils import account_activation_token
 # Create your views here.
 
 from django.core.mail import EmailMessage
+from django.contrib.auth import  settings
 
 
+from .otp import send_sms,gen_otp
 
-    
-
-
-# def index(request):
-#     return render(request, "user/index.html")
 
 
 
@@ -152,6 +72,8 @@ def register(request):
                     Profile.objects.create(user = new_user)
                     email = user_form.cleaned_data['email']
 
+
+                    
                     #email verfication 
                     email_verify_send(new_user,request,email)
                     messages.success(request, 'Account successfully created')
@@ -241,3 +163,76 @@ class verficationview(View):
             pass
 
         return redirect('login')
+
+
+
+def phone_number(request):
+    
+    if request.method == 'POST':
+        user_form = UserEditForm(instance = request.user,data = request.POST)
+        profile_form = ProfileEditForm(instance = request.user.profile,data = request.POST,files = request.FILES)
+
+        if user_form.is_valid() and profile_form.is_valid():
+            
+            user_form.save()
+            profile_form.save()
+
+
+            #verfication stuff
+            user_of = Profile.objects.get(user=request.user)
+            x = [user_of.phone_number.country_code,user_of.phone_number.national_number]
+            numb = f'''+{x[0]}{x[1]}'''
+            print(x,type(x),numb)
+            sended_otp = otp_sender(numb)
+            print(user_of.otp)
+            user_of.otp = sended_otp
+            user_of.save()
+            
+            
+
+
+            otp = True
+            messages.success(request,"Profile updated successfully")
+            return render(request,'tracker.html',{'otp':otp})
+        else:
+            messages.error(request,'Profile updated fail')
+
+    else:
+        user_form = UserEditForm(instance = request.user)
+        profile_form = ProfileEditForm(instance = request.user.profile)
+    return render(request,'tracker.html',{'profile_form':profile_form})
+
+
+def otp_sender(phone_number):
+    #otp place !!
+    account_sid = 'ACfe94a507b4fb448c9cfe385eee49f591'
+    auth_token = '952e8ea7c93e77b108f82a6939b0bab1'
+    genotp = gen_otp()
+    messages_otp = f'''
+            Thanks for using get  cam {genotp}
+    '''
+    send_sms(account_sid,auth_token,messages_otp,'+12057723212',phone_number)
+
+    return genotp
+
+
+
+def verify_number(request):
+    user_of = Profile.objects.get(user=request.user)
+    print("orginal:",user_of.otp,type(user_of.otp))
+
+    if request.method =="POST":
+        extracted_otp  = int(request.POST['otp'])
+        print("extracted :",extracted_otp,type(extracted_otp))
+
+
+        if extracted_otp == user_of.otp:
+            user_of.phone_verified = True
+            user_of.save()
+            messages.success(request, 'Phone number verified')
+            return redirect('home')
+
+        else:
+            messages.error(request, 'verification failed !!')
+
+    return redirect('home')

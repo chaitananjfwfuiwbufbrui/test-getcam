@@ -98,6 +98,12 @@
                                         <span id="cartno"  > ({{cartitems}}) </span>
                                     </a></li>
                                 <li><a href="/user">user</a></li>
+
+                                {% if phone_verified %}
+                                <li><a href="/auth/login">phone number verified</a></li>
+                                {% else %}
+                                <li><a href="{% url 'phone' %}">add phonenumber</a></li>
+                                {% endif %}
                                 <li><a href="/auth/logout">logout</a></li>
                             </ul>
                         </li>

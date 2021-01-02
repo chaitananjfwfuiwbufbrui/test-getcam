@@ -32,6 +32,11 @@ urlpatterns = [
 
 
     path('activate/<uidb64>/<token>/', verficationview.as_view(),name='activate'),
+
+
+    path('phone/', views.phone_number,name='phone'),
+    path('verify_number/', views.verify_number,name='verify-number'),
+
 # 
 ]
 

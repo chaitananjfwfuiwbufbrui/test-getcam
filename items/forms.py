@@ -27,5 +27,11 @@ class UserEditForm(forms.ModelForm):
 class ProfileEditForm(forms.ModelForm):
     class Meta:
         model = Profile
-        fields = ('photo',)
+        fields = ('phone_number','otp')
+
+        
+# class PhoneEditForm(forms.ModelForm):
+#     class Meta:
+#         model = Profile
+#         fields = ('phone_number')
     

@@ -1,15 +1,55 @@
 {% extends 'example.html' %}
+{% load crispy_forms_tags %}
 {% load static %}
 
+{% block style %}
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+  integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+  integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+  integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+{% endblock style %}
+{% block title %}tracker{% endblock title %}
+{% block body %}
+<!-- Button trigger modal -->
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter">
+  Launch demo modal
+</button>
+<div class="container">
 
-    {% block title %}tracker{% endblock title %}
-    {% block body %}
-    <!---->
-    <title>Hello, world!</title>
-  </head>
-  <body style="max-height: 100vh;">
-gvfgfgf
-    <div id="paypal-button-container"></div>
-    
-  </body>
-  {% endblock body %}
+
+  {% if otp %}
+  <form action="{% url 'verify-number' %}" method="post">
+
+    {% csrf_token %}
+        <input type="number" name="otp" placeholder="Enter yor otp" required="">
+        
+        <div class="read mt-3">
+            <input type="submit" value="Submit">
+        
+        </div>
+    </form>
+
+  {% else %}
+
+  <form method="post" enctype="multipart/form-data">
+
+
+    {{ profile_form.phone_number }}
+    <div hidden>
+
+      {{ profile_form.otp }}
+    </div>
+    {% csrf_token %}
+    <!-- <p><input type="submit" value="Save your changes"> </p> -->
+    <button type="submit" class="btn btn-primary btn-block">
+      verify otp
+    </button>
+  </form>
+  {% endif %}
+</div>
+<!-- Modal -->
+
+{% endblock body %}

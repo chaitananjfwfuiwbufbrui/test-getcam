@@ -46,8 +46,8 @@ INSTALLED_APPS = [
 
     #bootstrap
       'crispy_forms',
-
-
+    #phone number
+    'phonenumber_field',
 
     #social auth
     'allauth',
@@ -159,3 +159,5 @@ EMAIL_HOST_USER = 'kc508275@gmail.com'
 # DEFAULT_FROM_EMAIL = 'kc508275@gmail.com'
 EMAIL_HOST_PASSWORD = '2001kc2005'
 EMAIL_USE_TLS =True
+
+

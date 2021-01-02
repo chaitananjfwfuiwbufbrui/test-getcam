@@ -8,6 +8,7 @@ import  datetime
 # Create your views here.
 from django.shortcuts import render,HttpResponse,redirect
 from home.models import *
+from items.models import *
 from  django.contrib.auth.models import User 
 from django.contrib.auth import logout,authenticate
 from django.contrib.auth.forms import AuthenticationForm
@@ -266,8 +267,12 @@ def productss(request):
         latest = products.objects.filter(pub_date__range=["2020-09-17", "2020-09-18"])
         
         dataa = products.objects.all()
-            
-        context = {'dataa' : dataa,'items':items,"latest":latest,'cartitems':cartitems}
+
+
+
+        user_of = Profile.objects.get(user=request.user)
+        phone_verified = user_of.phone_verified 
+        context = {'dataa' : dataa,'items':items,"latest":latest,'cartitems':cartitems,'phone_verified':phone_verified}
         
         return render(request,'products.html',context)
     else:
