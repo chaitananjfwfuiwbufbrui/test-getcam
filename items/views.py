@@ -180,10 +180,9 @@ def phone_number(request):
 
             #verfication stuff
             user_of = Profile.objects.get(user=request.user)
-            x = [user_of.phone_number.country_code,user_of.phone_number.national_number]
-            numb = f'''+{x[0]}{x[1]}'''
-            print(x,type(x),numb)
-            sended_otp = otp_sender(numb)
+            
+            
+            sended_otp = otp_sender(uid_phone(user_of))
             print(user_of.otp)
             user_of.otp = sended_otp
             user_of.save()
@@ -192,7 +191,7 @@ def phone_number(request):
 
 
             otp = True
-            messages.success(request,"Profile updated successfully")
+            
             return render(request,'tracker.html',{'otp':otp})
         else:
             messages.error(request,'Profile updated fail')
@@ -206,7 +205,7 @@ def phone_number(request):
 def otp_sender(phone_number):
     #otp place !!
     account_sid = 'ACfe94a507b4fb448c9cfe385eee49f591'
-    auth_token = '952e8ea7c93e77b108f82a6939b0bab1'
+    auth_token = 'a989e2955dbcbaeaa47eae5e86cb3d95'
     genotp = gen_otp()
     messages_otp = f'''
             Thanks for using get  cam {genotp}
@@ -215,6 +214,10 @@ def otp_sender(phone_number):
 
     return genotp
 
+def message_sender(mes,phone_number):
+    account_sid = 'ACfe94a507b4fb448c9cfe385eee49f591'
+    auth_token = 'a989e2955dbcbaeaa47eae5e86cb3d95'
+    send_sms(account_sid,auth_token,mes,'+12057723212',phone_number)
 
 
 def verify_number(request):
@@ -230,9 +233,17 @@ def verify_number(request):
             user_of.phone_verified = True
             user_of.save()
             messages.success(request, 'Phone number verified')
+            mes =  " Thanks for verifing your phone number !!!"
+
+
+            message_sender(mes,uid_phone(user_of))
             return redirect('home')
 
         else:
             messages.error(request, 'verification failed !!')
 
     return redirect('home')
+def uid_phone(user_of):
+        x = [user_of.phone_number.country_code,user_of.phone_number.national_number]
+        numb = f'''+{x[0]}{x[1]}'''
+        return numb
