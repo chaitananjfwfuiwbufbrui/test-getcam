@@ -96,6 +96,17 @@ def register(request):
         # return render(request,'auth/register_done.html')
             return render(request,'auth/register.html',{'user_form' : user_form})
 
+# email send using trading
+import threading
+
+class EmailThread(threading.Thread):
+    def __init__(self, email_message):
+
+        self.email_message = email_message
+        threading.Thread.__init__(self)
+                            
+    def run(self):
+        self.email_message.send()
 def email_verify_send(new_user,request,email):
                     current_site = get_current_site(request)
                     email_body = {
@@ -118,7 +129,10 @@ def email_verify_send(new_user,request,email):
                         'noreply@semycolon.com',
                         [email],
                     )
-                    email.send(fail_silently=False)
+
+                    EmailThread(email).start()
+                 
+                    # email.send(fail_silently=False)
 @login_required
 def edit(request):
     if request.method == 'POST':
@@ -194,7 +208,8 @@ def phone_number(request):
             
             return render(request,'tracker.html',{'otp':otp})
         else:
-            messages.error(request,'Profile updated fail')
+            print(profile_form.errors)
+            messages.error(request,profile_form.errors)
 
     else:
         user_form = UserEditForm(instance = request.user)
@@ -247,3 +262,30 @@ def uid_phone(user_of):
         x = [user_of.phone_number.country_code,user_of.phone_number.national_number]
         numb = f'''+{x[0]}{x[1]}'''
         return numb
+
+
+def adhar(request):
+    from .aaadhar import validateVerhoeff 
+    s =False
+    if request.method =="POST":
+        extracted_adharnumber  = (request.POST['extracted_adharnumber'])
+        x = extracted_adharnumber.replace(" ", "") 
+        s = validateVerhoeff(x)
+       
+        print(s)
+        
+
+        if s:
+            user_of = Profile.objects.get(user=request.user)
+            user_of.profile_verified = True
+            user_of.id_proof = x
+            user_of.save()
+            messages.success(request, 'Profile verified  successfully')
+
+            return redirect('home')
+        else:
+            messages.info(request, 'Enter Correct Adhar Number')
+            return redirect('adhar')
+
+
+    return render(request,'adhar.html')

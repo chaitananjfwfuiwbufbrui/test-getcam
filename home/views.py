@@ -17,12 +17,30 @@ from  django.contrib import messages
 
 
 from datetime import datetime ,timedelta,date
+import threading
+
+
+
+
 
 
 # Create your views here.
 def home(request): 
    
     if request.user.is_authenticated:
+        #merchant acc
+        group = None
+        merchant = False
+        if request.user.groups.exists():
+
+            group = request.user.groups.all()[0].name
+            if group == 'merchant':
+                print(group)
+                merchant = True
+                
+        
+
+
         now = datetime.now()
         last = date.today() - timedelta(days=30)
         timestamp = datetime.date(now)
@@ -38,7 +56,7 @@ def home(request):
             
         dataa = products.objects.all()
                 
-        context = {'dataa' : dataa,"latest":latest,'cartitems':cartitems}
+        context = {'dataa' : dataa,"latest":latest,'cartitems':cartitems,'chay':merchant}
     else:
         latest = products.objects.filter(pub_date__range=["2020-09-17", "2021-12-25"])
         
@@ -272,7 +290,8 @@ def productss(request):
 
         user_of = Profile.objects.get(user=request.user)
         phone_verified = user_of.phone_verified 
-        context = {'dataa' : dataa,'items':items,"latest":latest,'cartitems':cartitems,'phone_verified':phone_verified}
+        profile_verified = user_of.profile_verified  
+        context = {'dataa' : dataa,'items':items,"latest":latest,'cartitems':cartitems,'phone_verified':phone_verified,"profile_verified":profile_verified}
         
         return render(request,'products.html',context)
     else:
@@ -286,65 +305,30 @@ def productss(request):
        
 
 
+def merchant(request):
+        from django.contrib.auth.models import Group
+        user = request.user
+        group = Group.objects.get(name='merchant')
+        user_of = Profile.objects.get(user=request.user)
+        print(user_of.phone_verified)
+        if user_of.phone_verified and user_of.profile_verified :
 
 
-#api
-# def login(request):
-#     if request.method == 'POST':
-#        loginuser = request.POST['loginuser'] 
-#        loginPassword= request.POST['loginPassword']
-#        user = authenticate(username=loginuser,password=loginPassword)
-#        if user is not None:
-#             auth_login(request,user)
-#             messages.success(request,"sucessfully login")
-            
-#             return redirect('home')
-#        else:
-#            messages.error(request,'invalid username')
-#            return redirect('login')
-  
-#     return render(request,'login.html')
-# def logouts(request):
-#     logout(request)
-#     messages.success(request,'successfully logout')
-#     return redirect('home')
+
+            user.is_staff=True
+
+            user.groups.add(group)
+            user.save()
+            messages.success(request,"merchant account created !!")
+        else:
+            if user_of.phone_verified is  False:
+
+                messages.info(request,"verify your phone number  create merchant account")
+                return redirect('phone')
+            if user_of.profile_verified is  False:
+
+                messages.info(request,"verify your  profile to create merchant account")
+                return redirect('adhar')
+
     
-
-
-
-# def signin(request):
-#     if request.method == 'POST':
-#        user = request.POST['signupuser'] 
-#        email = request.POST['signupemail']
-#        signupfname = request.POST['signupfname']
-#        signupsname = request.POST['signupsname']
-#        pass1 = request.POST['inputPassword1']
-#        pass2 = request.POST['inputPassword2']
-#        if len(user) > 10:
-#             messages.error(request,"user name should be less than 10 characters")
-#             return redirect('home')
-            
-#        if pass1 != pass2:
-#             messages.error(request,"passwoard should be match")
-#             return redirect('home')
-
-#        if not user.isalnum():
-#             messages.error(request,"username must be in alphabhates and numaric")
-#             return redirect('home')
-
-
-
-#        myuser = User.objects.create_user(user,email,pass1)
-#        myuser.first_name= signupfname
-#        myuser.last_name = signupsname
-#        myuser.save()
-#        messages.success(request,"your account has been successfully created")
-#        create_cus = Customer.objects.get_or_create(user=user,name=signupfname,email=email)
-#        create_cus.save()
-#        return redirect('signin')
-       
-#     else:
-#         return render(request,'signinpage.html')  
-
-       
-
+        return redirect('home')

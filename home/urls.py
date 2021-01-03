@@ -19,9 +19,7 @@ urlpatterns = [
      path('check/', views.check, name='check'),
 
 
-
-
-     # path('signin', views.signin, name='signin'),
-     # path('login', views.login, name='login'),
-     # path('logout', views.logouts, name='logout'),
+     #merchant account stuff'
+     path('merchant_account/', views.merchant, name='merchant_account'),
+    
 ]

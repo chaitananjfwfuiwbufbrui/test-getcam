@@ -99,6 +99,13 @@
                                     </a></li>
                                 <li><a href="/user">user</a></li>
 
+                                {% if profile_verified %}
+                                <li><a href="/auth/login">profile verified</a></li>
+                                {% else %}
+                                <li><a href="{% url 'adhar' %}">Add profile verification</a></li>
+                                {% endif %}
+
+
                                 {% if phone_verified %}
                                 <li><a href="/auth/login">phone number verified</a></li>
                                 {% else %}

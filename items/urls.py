@@ -38,6 +38,7 @@ urlpatterns = [
     path('verify_number/', views.verify_number,name='verify-number'),
 
 # 
+    path('adhar/', views.adhar,name='adhar'),
 ]
 
 # urlpatterns = [
