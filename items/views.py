@@ -220,7 +220,7 @@ def phone_number(request):
 def otp_sender(phone_number):
     #otp place !!
     account_sid = 'ACfe94a507b4fb448c9cfe385eee49f591'
-    auth_token = 'a989e2955dbcbaeaa47eae5e86cb3d95'
+    auth_token = '28b64851b9053c68fb6c626dd7ff7aa4'
     genotp = gen_otp()
     messages_otp = f'''
             Thanks for using get  cam {genotp}
@@ -231,7 +231,7 @@ def otp_sender(phone_number):
 
 def message_sender(mes,phone_number):
     account_sid = 'ACfe94a507b4fb448c9cfe385eee49f591'
-    auth_token = 'a989e2955dbcbaeaa47eae5e86cb3d95'
+    auth_token = '28b64851b9053c68fb6c626dd7ff7aa4'
     send_sms(account_sid,auth_token,mes,'+12057723212',phone_number)
 
 
@@ -271,11 +271,27 @@ def adhar(request):
         extracted_adharnumber  = (request.POST['extracted_adharnumber'])
         x = extracted_adharnumber.replace(" ", "") 
         s = validateVerhoeff(x)
-       
-        print(s)
-        
 
-        if s:
+
+    
+        final_check = False
+        try:
+
+            sqwe = Profile.objects.filter(id_proof  = x)
+            print(sqwe,type(sqwe),list(sqwe))
+            qwe = list(sqwe)
+            print(len(qwe))
+            if len(qwe) < 1 :
+                final_check = True
+            else:
+                final_check = False
+                messages.info(request, 'adhar already exists')
+                return redirect('adhar')
+
+        except :
+            pass
+
+        if final_check and s:
             user_of = Profile.objects.get(user=request.user)
             user_of.profile_verified = True
             user_of.id_proof = x
