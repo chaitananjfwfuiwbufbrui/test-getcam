@@ -210,8 +210,8 @@
                     <div class="desc1-right col-md-6 pl-lg-4">
                         <h3>{{single.product_name}}.</h3>
                         <h5>{{single.prize}} <a href="#">click for offer</a></h5>
-                        
-                        <form action="{% url 'provider' %}"  method="POST">
+
+                        <form action="{% url 'provider' %}" method="POST">
                             {% csrf_token %}
                             <label for="cars">Choose a provider:</label>
 
@@ -219,39 +219,66 @@
                             <select id="cars" name="cars">
                                 {% for i in all_obj %}
                                 <!-- logic for selection in option based on slug -->
-                                    {% if "{{i.slug}}" == "{{slugsad}}" %}
-                                    
-                                    <option value="{{i.slug}}"  name="data"  selected ></option>{{i.provider}}</option>
-                                    {% else %}
-                                    
-                                        <option value="{{i.slug}}"  name="data" >{{i.provider}}</option>
-                                    {% endif %}
+                                {% if "{{i.slug}}" == "{{slugsad}}" %}
 
-                                
+                                <option value="{{i.slug}}" name="data" selected></option>{{i.provider}}</option>
+                                {% else %}
+
+                                <option value="{{i.slug}}" name="data">{{i.provider}}</option>
+                                {% endif %}
+
+
                                 {% endfor %}
                             </select>
                             <div class="w3layouts-newsletter">
-                            <button class="btn1" type="submit"> change  </button>
-                        </div>
+                                <button class="btn1" type="submit"> change </button>
+                            </div>
                         </form>
 
 
 
                         <div class="available mt-3">
-                            <form action="#" method="post" class="w3layouts-newsletter">
-                                <input type="email" name="Email" placeholder="Enter your email..." required="">
-                                <button class="btn1">Check</button>
 
-                            </form>
 
                             {% if user.is_authenticated %}
-                            <a href="#" class="btn btn-info btn-lg">
+                            {% if already_ther %}
+                            <!-- cart already logic s are here -->
+                            <button type="submit"
+                                style="margin-top:1em ;" id="{{single.id}}" class="btn btn-info cart">
+
+                                
+                                </span>
+                                <span class="glyphicon glyphicon-shopping-cart"></span>
+                                added to cart
+
+                            </button>
+                            <a href="{% url 'cart' %}" target="_blank" rel="noopener noreferrer">
+                                <button type="submit"
+                                style="margin-top:1em ;" id="{{single.id}}" class="btn btn-info cart ">
+    
+                                <span class="glyphicon glyphicon-shopping-cart"></span>
+                                view
+                                </button>
+                            </a>
+                           
+                            {% else %}
+
+                            <button type="submit" data-products="{{single.id}}" data-action="add"
+                                style="margin-top:1em ;" id="{{single.id}}" class="btn btn-info cart update-cart">
+
                                 <span style="color: rgb(255, 255, 255); "><i class="fa fa-shopping-cart"
                                         aria-hidden="true"></i>
                                 </span>
+                                <span class="glyphicon glyphicon-shopping-cart"></span>
+                                add to cart
+                            </button>
+                                <!-- up to here  -->
 
-                                <span class="glyphicon glyphicon-shopping-cart"></span> Shopping Cart
-                            </a>
+
+                      
+
+                            {% endif %}
+
 
                             {% else %}
                             <span><a href="/login">login to save in wishlist </a></span>
@@ -342,3 +369,8 @@
 
 
 {% endblock body %}
+{% block js %}
+
+<script type="text/javascript" src="{% static 'css/cart.js' %}"></script>
+
+{% endblock %}

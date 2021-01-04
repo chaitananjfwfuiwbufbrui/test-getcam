@@ -256,7 +256,7 @@
         </div>
         <hr class="mb-4">
       </div>
-      <button >  <a href="/processorder/">chcek</a> </button>
+      <button >  <a onclick="submitformdata()" >chcek</a> </button>
       <div id="paypal-button-container"></div>
 
 
@@ -281,9 +281,13 @@
           purchase_units: [{
             amount: {
               value: parseFloat(Total).toFixed(2)
+              
             }
+            
           }]
+          
         });
+        
       },
       onApprove: function (data, actions) {
         // This function captures the funds from the transaction.

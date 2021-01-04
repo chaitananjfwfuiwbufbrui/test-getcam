@@ -75,7 +75,6 @@ def cart(request):
 
 
     
-    order ,created = Order.objects.get_or_create(customer=customer,complete=False)
     items = order.orderitems_set.all()
     context = {'items':items,'order':order,'cartitems':cartitems}
 
@@ -155,8 +154,11 @@ def checkout(request):
     cartitems = order.get_cart_item
     context = {'items':items,'order':order,'cartitems':cartitems}
     
-
-
+    if profile_and_phnumberchecker(request,customer,"welcome to check out enter the details to process order") is False:
+        
+    
+        return render_page(request,customer,"to get in to checkout page")
+    print(profile_and_phnumberchecker(request,customer,"welcome to check out enter the details to process order") )
     return render(request,'checkout.html',context)
 def search(request):
     return render(request,'search.html')
@@ -175,9 +177,9 @@ def singleproduct(request,slug):
         #algo for pricing 
         s = products.objects.filter(slug=slug).first()
         print(s.product_name)
-        single = s =  products.objects.filter(slug=slug).first()
+        single = s 
         imageya = images_fiels.objects.filter(product = single)
-        print(imageya )
+        print(single.id)
         
 
 
@@ -190,6 +192,15 @@ def singleproduct(request,slug):
 
 
 
+        #cart check 
+        orde = Order.objects.filter(customer = customer).first()
+        prod = Orderitems.objects.filter(order = orde)
+        already_ther = False
+        for i in prod:
+            if i.product.slug == slug:
+
+                already_ther = True
+            
 
 
 
@@ -214,7 +225,7 @@ def singleproduct(request,slug):
             if q in newcat:
                 newcat.remove(q)
         
-        context = {'single' : single,"prod":new_list,"catagory":newcat,'cartitems':cartitems,"imageya":imageya,"all_obj":all_obj,"slugsad":slugsad}
+        context = {'single' : single,"prod":new_list,"catagory":newcat,'cartitems':cartitems,"imageya":imageya,"all_obj":all_obj,"already_ther":already_ther,"slugsad":slugsad}
         return render(request,'singleproduct.html',context)
 
     else:
@@ -320,6 +331,10 @@ def productss(request):
         user_of = Profile.objects.get(user=request.user)
         phone_verified = user_of.phone_verified 
         profile_verified = user_of.profile_verified  
+
+
+
+        
         context = {'dataa' : dataa,'items':items,"latest":latest,'cartitems':cartitems,'phone_verified':phone_verified,"profile_verified":profile_verified}
         
         return render(request,'products.html',context)
@@ -340,6 +355,16 @@ def merchant(request):
         group = Group.objects.get(name='merchant')
         user_of = Profile.objects.get(user=request.user)
         print(user_of.phone_verified)
+        # if profile_and_phnumberchecker(request,user,"merchant account created","to create merchant account"):
+        #     user.is_staff=True
+
+        #     user.groups.add(group)
+        #     user.save()
+        # else:
+        #     profile_and_phnumberchecker(request,user,"merchant account created","to create merchant account")
+
+          
+
         if user_of.phone_verified and user_of.profile_verified :
 
 
@@ -361,3 +386,26 @@ def merchant(request):
 
     
         return redirect('home')
+
+
+def profile_and_phnumberchecker(request,us,succes):
+        user_of = Profile.objects.get(user=us)
+        x = False 
+        if user_of.phone_verified and user_of.profile_verified :
+
+
+            messages.success(request,f"{succes}!!")
+            x = True
+            return x
+        else:
+            return x
+def render_page(request,us,fails):
+            user_of = Profile.objects.get(user=us)
+            if user_of.phone_verified is  False:
+
+                messages.info(request,f"verify your phone number  {fails}")
+                return redirect("/auth/phone")
+            if user_of.profile_verified is  False:
+
+                messages.info(request,f"verify your  profile {fails}")
+                return redirect('adhar')
