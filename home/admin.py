@@ -10,6 +10,7 @@ admin.site.register(Orderitems)
 admin.site.register(Order)
 admin.site.register(ShippingOrder)
 admin.site.register(Customer)
+admin.site.register(essential_details)
 
 
 class postimageadmin(admin.StackedInline):

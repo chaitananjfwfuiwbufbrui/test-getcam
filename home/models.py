@@ -107,3 +107,11 @@ class ShippingOrder(models.Model):
     zipcode = models.IntegerField(null=True)
     state = models.CharField(max_length=100,null=True)
     date_added = models.DateTimeField(auto_now_add=True)
+
+
+class essential_details(models.Model):
+    user = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
+    no_of_orders = models.IntegerField(default=0)
+    completed_orders = models.ForeignKey(Order,on_delete=models.SET_NULL,blank=True,null=True)
+    product = models.ForeignKey(Orderitems,on_delete=models.SET_NULL,blank=True,null=True)
+    address = models.ForeignKey(ShippingOrder,on_delete=models.SET_NULL,blank=True,null=True)
