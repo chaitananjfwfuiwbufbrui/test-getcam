@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from items.models import *
 # Create your models here.
 
 from django.db import models
@@ -10,6 +10,7 @@ import requests
 
 # Create your models here.
 class products(models.Model):
+    provider = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
     product_id = models.AutoField
     product_name = models.CharField( max_length=50)
     prize = models.IntegerField(default=0)
@@ -17,14 +18,28 @@ class products(models.Model):
     sub_category = models.CharField(max_length=50,default="")
     product_image =models.ImageField(upload_to="shop/images",default="")
     desc = models.CharField(max_length=300)
+
     pub_date = models.DateField()
+    expire_date = models.DateField()
+
     slug = models.SlugField(blank=True,null=True)
-    
+    is_availble = models.BooleanField(default=True)
 
 
 
     def __str__(self):
         return self.product_name +"         catagiory:   " +self.category + "subcatagiry :   "+ self.sub_category
+
+
+
+class images_fiels(models.Model):
+    product = models.ForeignKey(products,on_delete=models.SET_NULL,blank=True,null=True)
+    product_image =models.ImageField(upload_to="shop/images",default="")
+
+
+
+
+
 
 def slug_generator(sender,instance,*args,**kwargs):
     if not instance.slug:

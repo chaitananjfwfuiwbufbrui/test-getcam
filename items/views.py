@@ -69,7 +69,7 @@ def register(request):
                     new_user.set_password(user_form.cleaned_data['password'])
                     new_user.is_active = False
                     new_user.save()
-                    Profile.objects.create(user = new_user)
+                    Profile.objects.create(user = new_user,id_proof = "45641")
                     email = user_form.cleaned_data['email']
 
 

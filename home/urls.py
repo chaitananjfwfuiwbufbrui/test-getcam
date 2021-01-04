@@ -16,6 +16,7 @@ urlpatterns = [
      path('user/', views.user, name='user'),
      path('contact', views.Contact, name='contact'),
      path('single/<str:slug>',views.singleproduct,name ='singleproduct'),
+     path('provider/',views.provider,name ='provider'),
      path('check/', views.check, name='check'),
 
 

@@ -115,7 +115,7 @@ def updatecart(request):
 def processorder(request):
     print('data:',request.body)
     customer = request.user
-    transection_id = datetime.datetime.now().timestamp
+    transection_id = datetime.now().timestamp
     order ,created = Order.objects.get_or_create(customer=customer,complete=False)
 
     data = json.loads(request.body)
@@ -124,6 +124,7 @@ def processorder(request):
     print(transection_id)
     if total == order.get_cart_total:
         order.complete = True
+    order.complete = True
     order.save()
 
     if order.complete == True:
@@ -161,6 +162,7 @@ def search(request):
     return render(request,'search.html')
 
 
+
 def singleproduct(request,slug):
     if request.user.is_authenticated:
         
@@ -168,10 +170,31 @@ def singleproduct(request,slug):
         order ,created = Order.objects.get_or_create(customer=customer,complete=False)
         items = order.orderitems_set.all()
         cartitems = order.get_cart_item
+
+
+        #algo for pricing 
+        s = products.objects.filter(slug=slug).first()
+        print(s.product_name)
+        single = s =  products.objects.filter(slug=slug).first()
+        imageya = images_fiels.objects.filter(product = single)
+        print(imageya )
         
-        single = products.objects.filter(slug=slug).first()
-        
-        
+
+
+        all_obj = products.objects.filter(product_name=s.product_name)
+
+
+        #algo for pricing ^^^^^^
+        slugsad = str(slug)
+
+
+
+
+
+
+
+
+
         prod = products.objects.filter(sub_category=single.sub_category)
         subheading = products.objects.filter(category=single.category)
         
@@ -191,7 +214,7 @@ def singleproduct(request,slug):
             if q in newcat:
                 newcat.remove(q)
         
-        context = {'single' : single,"prod":new_list,"catagory":newcat,'cartitems':cartitems}
+        context = {'single' : single,"prod":new_list,"catagory":newcat,'cartitems':cartitems,"imageya":imageya,"all_obj":all_obj,"slugsad":slugsad}
         return render(request,'singleproduct.html',context)
 
     else:
@@ -222,7 +245,13 @@ def singleproduct(request,slug):
         return render(request,'singleproduct.html',context)
 
 
+def provider(request):
+    if request.method =="POST":
+            selected_provider = request.POST['cars']
+            print(selected_provider)
+            return redirect(f"/single/{selected_provider}")
 
+ 
     
 def tracker(request):
     product = products.objects.all()
