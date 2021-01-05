@@ -27,7 +27,7 @@ from django.core.mail import EmailMessage
 from django.contrib.auth import  settings
 
 
-from .otp import send_sms,gen_otp
+from .otp import send_sms,gen_otp,sms_sender
 
 
 
@@ -218,21 +218,18 @@ def phone_number(request):
 
 
 def otp_sender(phone_number):
-    #otp place !!
-    account_sid = 'ACfe94a507b4fb448c9cfe385eee49f591'
-    auth_token = '28b64851b9053c68fb6c626dd7ff7aa4'
+   
     genotp = gen_otp()
     messages_otp = f'''
             Thanks for using get  cam {genotp}
     '''
-    send_sms(account_sid,auth_token,messages_otp,'+12057723212',phone_number)
-
+    
+    sms_sender(phone_number,messages_otp)
     return genotp
 
 def message_sender(mes,phone_number):
-    account_sid = 'ACfe94a507b4fb448c9cfe385eee49f591'
-    auth_token = '28b64851b9053c68fb6c626dd7ff7aa4'
-    send_sms(account_sid,auth_token,mes,'+12057723212',phone_number)
+    
+    sms_sender(phone_number,mes)
 
 
 def verify_number(request):
