@@ -31,6 +31,9 @@ def home(request):
         #merchant acc
         group = None
         merchant = False
+        print(request.user)
+        user_name = request.user
+        Profile.objects.get_or_create(user = user_name)
         if request.user.groups.exists():
 
             group = request.user.groups.all()[0].name

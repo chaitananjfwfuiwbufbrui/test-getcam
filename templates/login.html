@@ -2,6 +2,8 @@
 {% block title %}sign-in page{% endblock title %}
 {% load static %}
 
+{% load socialaccount %}
+{% providers_media_js %} 
 
 {% block style %}
 
@@ -61,6 +63,13 @@
 									<button type="submit" class="btn btn-primary btn-block">
 										Login
 									</button>
+									
+									<div id="social">
+										<a class="facebookBtn smGlobalBtn" href="{% provider_login_url "facebook" method="oauth2" %}" ></a>
+		
+										<a class="googleplusBtn smGlobalBtn" href="{% provider_login_url "google" %}" ></a>
+									</div>
+									   
 								</div>
 								<div class="mt-4 text-center">
 									Don't have an account? <a href="/auth/signin">Create One</a>
