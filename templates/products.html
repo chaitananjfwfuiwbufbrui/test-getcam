@@ -30,6 +30,20 @@
     rel="stylesheet">
 <!-- //Fonts -->
 
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<link rel="stylesheet" href="/resources/demos/style.css">
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+$( function() {
+
+  $( "#products_search" ).autocomplete({
+    source:"{% url 'search'%}"
+  });
+} );
+</script>
+</head>
+
 
 {% endblock style %}
 
@@ -45,12 +59,13 @@
         <div class="row">
             <!-- product left -->
             <div class="side-bar col-lg-4">
-
+                
                 <div class="search-bar w3layouts-newsletter">
                     <h3 class="sear-head">Search Here..</h3>
-                    <form action="#" method="post" class="d-flex">
-                        <input type="search" placeholder="Product name..." name="search" class="form-control"
-                            required="">
+                    <form action=" {% url 'search' %}" method="post" class="d-flex">
+                        {% csrf_token %}
+                            <input type="search" placeholder="Product name..." id = "products_search" name="search" class="form-control"
+                                required="">
                         <button class="btn1"><span class="fa fa-search" aria-hidden="true"></span></button>
                     </form>
                 </div>

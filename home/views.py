@@ -21,7 +21,24 @@ import threading
 
 
 
+def test(request):
+    if 'term' in request.GET:
+        qs = products.objects.filter(product_name__istartswith = request.GET.get('term'))
+        titles = list()
+        for i in qs:
+            
+            titles.append(i.product_name)
 
+        return JsonResponse(titles,safe=False)
+
+    if request.method =="POST":
+            name = request.POST['search']
+            print(name)
+            dataa = products.objects.filter(product_name = name)
+
+            context = {'dataa' : dataa}
+            return render(request,'products.html',context)        
+    return render(request,'test.html')
 
 
 # Create your views here.
@@ -164,7 +181,27 @@ def checkout(request):
     print(profile_and_phnumberchecker(request,customer,"welcome to check out enter the details to process order") )
     return render(request,'checkout.html',context)
 def search(request):
-    return render(request,'search.html')
+    if 'term' in request.GET:
+        qs = products.objects.filter(product_name__istartswith = request.GET.get('term'))
+        titles = list()
+        for i in qs:
+            
+            titles.append(i.product_name)
+
+        return JsonResponse(titles,safe=False)
+
+    if request.method =="POST":
+            name = request.POST['search']
+            print(name)
+            dataa = products.objects.filter(product_name = name)
+
+            context = {'dataa' : dataa}
+            return render(request,'products.html',context)        
+    return render(request,'test.html')
+
+
+    
+    
 
 
 
